@@ -1,0 +1,36 @@
+#include <DHT.h>
+
+// The pin used for the dht sensor 
+#define dhtPin 3
+
+// Initializes a new DHT variable called dht
+// The sensor used is the DHT22 model
+DHT dht(dhtPin, DHT22); 
+
+// Store the sensor values in the variables blow
+float humidity, temp;
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+
+}
+
+void loop() {
+  // Read the humidity values
+  humidity = dht.readHumidity();
+
+  // Read the temp values
+  temp = dht.readTemperature();
+
+  // Print the values onto the serial monitor
+  Serial.print("Humidity: ");
+  Serial.print(humidity);
+  Serial.print("Tempearture: ");
+  Serial.print(temp);
+
+  // Print the readings every 5 seconds
+  delay(5000);
+
+  
+}
