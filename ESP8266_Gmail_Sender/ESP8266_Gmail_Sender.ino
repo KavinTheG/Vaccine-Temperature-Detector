@@ -31,7 +31,7 @@ const char* password = "Apple2013";                       // WIFI network passwo
 uint8_t connection_state = 0;                    // Connected to WIFI or not
 uint16_t reconnect_interval = 10000;             // If not connected wait time to try again
 #pragma endregion Globals
-
+boolean sent = false;
 
 String subject, body;
 /*uint8_t WiFiConnect(const char* nSSID = nullptr, const char* nPassword = nullptr)
@@ -114,7 +114,6 @@ void setup()
   timeClient.begin();
   timeClient.setTimeOffset(utcOffsetInSeconds);
 }
-boolean sent = false;
 
 void loop(){
   timeClient.update();
