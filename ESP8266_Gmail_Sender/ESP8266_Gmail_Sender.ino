@@ -3,6 +3,8 @@
 #include <NTPClient.h>
 #include <DHT.h>
 #include <WiFiUdp.h>
+#include <LiquidCrystal_I2C.h>
+
 
 
 // UTC Offset, for canada eastern time its -5:00
@@ -16,7 +18,7 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org");
 
 // The pin used for the dht sensor 
-#define dhtPin 5
+#define dhtPin 14 // D5 on esp8266
 
 // Initializes a new DHT variable called dht
 // The sensor used is the DHT22 model
@@ -31,7 +33,17 @@ const char* password = "Apple2013";                       // WIFI network passwo
 uint8_t connection_state = 0;                    // Connected to WIFI or not
 uint16_t reconnect_interval = 10000;             // If not connected wait time to try again
 #pragma endregion Globals
-boolean sent = false;
+
+boolean sentMail = false;
+boolean changeDisplay = false;
+
+// set the LCD number of columns and rows
+int lcdColumns = 16;
+int lcdRows = 2;
+
+// set LCD address, number of columns and rows
+// if you don't know your display address, run an I2C scanner sketch
+LiquidCrystal_I2C lcd(0x27, lcdColumns, lcdRows);
 
 String subject, body;
 /*uint8_t WiFiConnect(const char* nSSID = nullptr, const char* nPassword = nullptr)
@@ -113,7 +125,15 @@ void setup()
   
   timeClient.begin();
   timeClient.setTimeOffset(utcOffsetInSeconds);
+
+    // put your setup code here, to run once:
+  lcd.init();
+
+  // turns on the backlight
+  lcd.backlight();
+  
 }
+
 
 void loop(){
   timeClient.update();
@@ -130,13 +150,30 @@ void loop(){
 
 
   //Serial.println(timeClient.getMinutes());
-  if (timeClient.getMinutes() % 3 == 0 && !sent){
+  if (timeClient.getMinutes() % 3 == 0 && !sentMail){
     gmailSender(subject, body);
-    sent = true;
+    sentMail = true;
   }
   if (timeClient.getMinutes() % 3 != 0) {
-    sent = false;
+    sentMail = false;
   }
-  
+
+  if (timeClient.getSeconds() % 5 == 0 && !changeDisplay) { // change every 5 seconds
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("ESP8266 #1");
+
+    String displayMessage = "Temp: ";
+    displayMessage += dht.readTemperature();
+    
+    lcd.setCursor(0, 1);
+    lcd.print(displayMessage);
+
+     changeDisplay = true;
+  }
+
+  if (timeClient.getSeconds() % 5 != 0) {
+    changeDisplay = false;
+  }
   
 }

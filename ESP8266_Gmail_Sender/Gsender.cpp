@@ -52,6 +52,8 @@ bool Gsender::Send(const String &to, const String &message)
 {
   WiFiClientSecure client;
   client.setInsecure();
+
+  
 #if defined(GS_SERIAL_LOG_2)
   Serial.print("Connecting to :");
   Serial.println(SMTP_SERVER);  
@@ -83,12 +85,18 @@ bool Gsender::Send(const String &to, const String &message)
 #if defined(GS_SERIAL_LOG_2)
   Serial.println("EMAILBASE64_LOGIN:");
 #endif
+
+  
+
   client.println(EMAILBASE64_LOGIN);
   AwaitSMTPResponse(client);
 
 #if defined(GS_SERIAL_LOG_2)
   Serial.println("EMAILBASE64_PASSWORD:");
 #endif
+
+
+
   client.println(EMAILBASE64_PASSWORD);
   if (!AwaitSMTPResponse(client, "235")) {
     _error = "SMTP AUTH error";
